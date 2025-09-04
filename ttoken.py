@@ -31,6 +31,7 @@ class TOKEN(IntEnum):
     menos = 27
     multiplica = 28
     divide = 29
+    porcent = 36
     LEIA = 30
     ESCREVA = 31
     VAR = 32
@@ -76,6 +77,7 @@ class TOKEN(IntEnum):
             33: "{",
             34: "}",
             35: "=",
+            36: "%",
         }
         return nomes[token]
 
