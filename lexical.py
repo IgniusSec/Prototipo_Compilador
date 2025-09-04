@@ -1,6 +1,22 @@
 from ttoken import TOKEN
 
-EXCLUDED_CHARS = ["(", ")", ",", ";"]
+EXCLUDED_CHARS = [
+    "(",
+    ")",
+    ",",
+    ".",
+    ";",
+    "<",
+    ">",
+    "*",
+    "+",
+    "/",
+    "-",
+    "%",
+    "=",
+    "{",
+    "}",
+]
 BROKEN_CHARS = ["\n"]
 END_FILE = "."
 PATH_FILE = "exemplo.toy"
@@ -22,14 +38,15 @@ class Lexical:
         self.linha = 1
         self.coluna = 0
 
-        # limpa o código
-        self.trash_code()
+        # limpa o código, retira os espaços mas mantem os comentários para contagem de linha e coluna correta
+        self.trash_spaces()
 
         self.index = 0
+        self.comments = 0
         self.token_atual = None
 
     def end_of_file(self):
-        return self.index >= self.arq_size
+        return self.index >= (self.arq_size - self.comments)
 
     # pega um char
     def get_char(self):
@@ -41,6 +58,11 @@ class Lexical:
         else:
             self.coluna += 1
         return char
+
+    def print_token(self, token_atual):
+        (token, lexema, linha, coluna) = token_atual
+        msg = TOKEN.msg(token)
+        print(f"(message: {msg} || lex: {lexema} || lin {linha}, col {coluna})")
 
     # devolve char
     def unget_char(self, simbol):
@@ -56,28 +78,21 @@ class Lexical:
         aux = index
         while self.content[aux] != "\n":
             self.content.pop(aux)
+            self.comments += 1
         # tira os \n pos comentário
         while self.content[aux] == "\n":
             self.content.pop(aux)
             self.linha += 1
+            self.comments += 1
 
     # limpa o código
-    def trash_code(self):
+    def trash_spaces(self):
         char = ""
         index = 0
         bars = 0
         while char != END_FILE:
             char = self.content[index]
-            if char == "/":
-                bars += 1
-                if bars > 1:
-                    self.trash_comments(index)
-                    bars = 0
-                    self.linha += 1
-            elif char != "/" and bars > 0:
-                bars = 0
-            # Salta as string
-            elif char == '"':
+            if char == '"':
                 index += 1
                 while (self.content[index]) != '"':
                     index += 1
@@ -96,7 +111,7 @@ class Lexical:
             self.content.pop(index)
             index += 1
 
-        # atualiza tamanho do arquivo após remoção de comentários
+        # atualiza tamanho do arquivo após remoção de espaços
         self.arq_size = len(self.content)
 
     """
@@ -117,7 +132,9 @@ class Lexical:
         col = self.coluna
 
         while True:
-            if char not in BROKEN_CHARS and char not in EXCLUDED_CHARS:
+            if (char not in BROKEN_CHARS and char not in EXCLUDED_CHARS) or (
+                estado == 4
+            ):
                 lexema += char
             if estado == 1:
                 # letra/simbolo
@@ -133,8 +150,14 @@ class Lexical:
                     return (TOKEN.abrePar, "(", lin, col)
                 elif char == ")":
                     return (TOKEN.fechaPar, ")", lin, col)
+                elif char == "{":
+                    return (TOKEN.abreChave, "{", lin, col)
+                elif char == "}":
+                    return (TOKEN.fechaChave, "}", lin, col)
                 elif char == ",":
                     return (TOKEN.virg, ",", lin, col)
+                elif char == ".":
+                    return (TOKEN.pto, ".", lin, col)
                 elif char == ";":
                     return (TOKEN.ptoVirg, ";", lin, col)
                 elif char == "+":
@@ -144,7 +167,7 @@ class Lexical:
                 elif char == "*":
                     return TOKEN.multiplica, "*", lin, col
                 elif char == "/":
-                    return TOKEN.divide, "/", lin, col
+                    estado = 9
                 elif char == "%":
                     return TOKEN.porcent, "%", lin, col
                 elif char == "<":
@@ -207,6 +230,17 @@ class Lexical:
                 else:
                     return (TOKEN.NOT, lexema, lin, col)
 
+            elif estado == 9:
+                if char == "/":
+                    # index - 2 por causa das 2 /
+                    self.index -= 2
+                    self.trash_comments(self.index)
+                    lin = self.linha
+                    col = 0
+                    estado = 1
+                else:
+                    return TOKEN.divide, "/", lin, col
+
             char = self.get_char()
 
 
@@ -215,4 +249,4 @@ if __name__ == "__main__":
 
     while not lex.end_of_file():
         tok = lex.get_token()
-        print(tok)
+        lex.print_token(tok)
