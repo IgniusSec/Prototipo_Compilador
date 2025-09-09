@@ -1,4 +1,5 @@
 from ttoken import TOKEN
+import sys
 
 EXCLUDED_CHARS = [
     "(",
@@ -245,8 +246,13 @@ class Lexical:
 
 
 if __name__ == "__main__":
-    lex = Lexical(PATH_FILE)
+    path = PATH_FILE
+    if len(sys.argv) <= 1:
+        print("Uso: python3 seu_script.py <arquivo>")
+    else:
+        path = sys.argv[1]
+        lex = Lexical(path)
 
-    while not lex.end_of_file():
-        tok = lex.get_token()
-        lex.print_token(tok)
+        while not lex.end_of_file():
+            tok = lex.get_token()
+            lex.print_token(tok)
