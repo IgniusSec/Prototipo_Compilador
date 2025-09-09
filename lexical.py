@@ -17,7 +17,7 @@ EXCLUDED_CHARS = [
     "{",
     "}",
 ]
-BROKEN_CHARS = ["\n"]
+BROKEN_CHARS = ["\n", " "]
 END_FILE = "."
 PATH_FILE = "exemplo.toy"
 
@@ -34,12 +34,11 @@ class Lexical:
             print("File not found!")
             return
 
+        self.content.append("\0")
+
         self.arq_size = len(self.content)
         self.linha = 1
         self.coluna = 0
-
-        # limpa o código, retira os espaços mas mantem os comentários para contagem de linha e coluna correta
-        self.trash_spaces()
 
         self.index = 0
         self.comments = 0
@@ -66,7 +65,7 @@ class Lexical:
 
     # devolve char
     def unget_char(self, simbol):
-        if simbol == "\n":
+        if simbol in BROKEN_CHARS:
             self.index += 1
         if self.index > 0:
             self.index -= 1
@@ -124,9 +123,10 @@ class Lexical:
         lexema = ""
         char = self.get_char()
 
-        if char == "\n":
-            self.unget_char(char)
-            char = self.get_char()
+        if char in BROKEN_CHARS:
+            while char in BROKEN_CHARS:
+                self.unget_char(char)
+                char = self.get_char()
 
         lin = self.linha
         col = self.coluna
@@ -195,7 +195,7 @@ class Lexical:
             elif estado == 3:
                 if char.isnumeric():
                     estado = 3
-                elif char in EXCLUDED_CHARS:
+                elif char in EXCLUDED_CHARS or char in BROKEN_CHARS:
                     self.unget_char(char)
                     return (TOKEN.num, lexema, lin, col)
                 else:
@@ -208,27 +208,27 @@ class Lexical:
 
             elif estado == 5:
                 if char == "=":
-                    return (TOKEN.menorIgual, lexema, lin, col)
+                    return (TOKEN.menorIgual, "<=", lin, col)
                 else:
-                    return (TOKEN.menor, lexema, lin, col)
+                    return (TOKEN.menor, "<", lin, col)
 
             elif estado == 6:
                 if char == "=":
-                    return (TOKEN.maiorIgual, lexema, lin, col)
+                    return (TOKEN.maiorIgual, ">=", lin, col)
                 else:
-                    return (TOKEN.maior, lexema, lin, col)
+                    return (TOKEN.maior, ">", lin, col)
 
             elif estado == 7:
                 if char == "=":
-                    return (TOKEN.igual, lexema, lin, col)
+                    return (TOKEN.igual, "==", lin, col)
                 else:
-                    return (TOKEN.atrib, lexema, lin, col)
+                    return (TOKEN.atrib, "=", lin, col)
 
             elif estado == 8:
                 if char == "=":
-                    return (TOKEN.diferente, lexema, lin, col)
+                    return (TOKEN.diferente, "!=", lin, col)
                 else:
-                    return (TOKEN.NOT, lexema, lin, col)
+                    return (TOKEN.NOT, "!", lin, col)
 
             elif estado == 9:
                 if char == "/":
