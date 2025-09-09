@@ -39,7 +39,7 @@ class Lexical:
 
         self.arq_size = len(self.content)
         self.linha = 1
-        self.coluna = 0
+        self.coluna = 1
 
         self.index = 0
         self.comments = 0
@@ -66,12 +66,11 @@ class Lexical:
 
     # devolve char
     def unget_char(self, simbol):
-        if simbol in BROKEN_CHARS:
-            self.index += 1
-        if self.index > 0:
-            self.index -= 1
-        if self.coluna > 0:
-            self.coluna -= 1
+        if simbol not in BROKEN_CHARS:
+            if self.index > 0:
+                self.index -= 1
+            if self.coluna > 0:
+                self.coluna -= 1
 
     # remove comentarios
     def trash_comments(self, index):
@@ -237,7 +236,7 @@ class Lexical:
                     self.index -= 2
                     self.trash_comments(self.index)
                     lin = self.linha
-                    col = 0
+                    col = 1
                     estado = 1
                 else:
                     return TOKEN.divide, "/", lin, col
