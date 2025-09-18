@@ -38,6 +38,7 @@ class TOKEN(IntEnum):
     abreChave = 33
     fechaChave = 34
     atrib = 35
+    resto = 36
 
     @classmethod
     def msg(cls, token):
@@ -50,8 +51,8 @@ class TOKEN(IntEnum):
             6: "if",
             7: "else",
             8: "while",
-            9: "begin",
-            10: "end",
+            9: "inicio",
+            10: "fim",
             11: "program",
             12: "(",
             13: ")",
@@ -87,8 +88,8 @@ class TOKEN(IntEnum):
             "program": TOKEN.PROGRAM,
             "if": TOKEN.IF,
             "while": TOKEN.WHILE,
-            "begin": TOKEN.BEGIN,
-            "end": TOKEN.END,
+            "inicio": TOKEN.BEGIN,
+            "fim": TOKEN.END,
             "else": TOKEN.ELSE,
             "leia": TOKEN.LEIA,
             "escreva": TOKEN.ESCREVA,
