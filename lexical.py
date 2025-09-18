@@ -188,7 +188,29 @@ class Lexical:
                     estado = 2
                 elif char in EXCLUDED_CHARS or char in BROKEN_CHARS:
                     self.unget_char(char)
-                    return (TOKEN.ident, lexema, lin, col)
+                    if lexema == "inicio":
+                        return TOKEN.BEGIN, lexema, lin, col
+                    if lexema == "fim":
+                        return TOKEN.END, lexema, lin, col
+
+                    if lexema == "if":
+                        return TOKEN.IF, lexema, lin, col
+                    if lexema == "else":
+                        return TOKEN.ELSE, lexema, lin, col
+
+                    if lexema == "leia":
+                        return TOKEN.LEIA, lexema, lin, col
+                    if lexema == "escreva":
+                        return TOKEN.ESCREVA, lexema, lin, col
+
+                    elif lexema == "and":
+                        return TOKEN.AND, lexema, lin, col
+                    elif lexema == "or":
+                        return TOKEN.OR, lexema, lin, col
+                    elif lexema == "not":
+                        return TOKEN.NOT, lexema, lin, col
+                    else:
+                        return (TOKEN.ident, lexema, lin, col)
                 else:
                     return (TOKEN.erro, lexema, lin, col)
 
