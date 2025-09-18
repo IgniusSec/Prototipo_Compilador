@@ -190,17 +190,17 @@ class Lexical:
                     self.unget_char(char)
                     if lexema == "inicio":
                         return TOKEN.BEGIN, lexema, lin, col
-                    if lexema == "fim":
+                    elif lexema == "fim":
                         return TOKEN.END, lexema, lin, col
 
-                    if lexema == "if":
+                    elif lexema == "if":
                         return TOKEN.IF, lexema, lin, col
-                    if lexema == "else":
+                    elif lexema == "else":
                         return TOKEN.ELSE, lexema, lin, col
 
-                    if lexema == "leia":
+                    elif lexema == "leia":
                         return TOKEN.LEIA, lexema, lin, col
-                    if lexema == "escreva":
+                    elif lexema == "escreva":
                         return TOKEN.ESCREVA, lexema, lin, col
 
                     elif lexema == "and":
